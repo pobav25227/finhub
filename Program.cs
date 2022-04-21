@@ -9,18 +9,34 @@ var jsonString = await System.IO.File.ReadAllTextAsync("symbol.json");
 var symbols = JsonSerializer.Deserialize<List<FinnHubModel>>(jsonString);
 
 var count = symbols.Count;
+if (count == 0)
+{
+    Console.WriteLine("Error: Symbol count is zero!");
+    return;
+}
 
 var key = "c9c0aeqad3i8r0u4aka0";
 var client = new FinnHubClient(key);
 
+await ShowTimeOfSymbolSerial(symbols, count, client);
 
+static async Task ShowTimeOfSymbolSerial(List<FinnHubModel>? symbols, int count, FinnHubClient client)
+{
+    var watch = new Stopwatch();
+    watch.Start();
+    foreach (var item in symbols)
+    {
+        var datas = await client.GetCandlesAsync(item.Symbol, FinnHub.Net.Enums.FinnHubTimeResolutions.Daily, DateTime.Now.AddDays(-2), DateTime.Now);
+        if (!datas.Success)
+        {
+            Console.WriteLine($"Errro in get data from {item.Symbol}: {datas.Error}");
+        }
+    }
+    watch.Stop();
 
-var watch = new Stopwatch();
-watch.Start();
-var datas = await client.GetCandlesAsync("BINANCE:BTCUSDT", FinnHub.Net.Enums.FinnHubTimeResolutions.Daily, DateTime.Now.AddDays(-2), DateTime.Now);
-watch.Stop();
-Console.WriteLine($"{watch.Elapsed.TotalSeconds} sec");
-Console.WriteLine(datas.Error);
+    Console.WriteLine($"{count} symbols serial process run in {watch.Elapsed.TotalSeconds} sec");
+}
+/*
 var i = 1;
 Console.WriteLine("#" + ": \t" + "Low \t" + " \t" + "High" + " \t\t" + "Open" + " \t\t" + "Close" + "\t \t" + "Volume" + "\t \t" + "Time");
 Console.WriteLine("--------------------------------------------------------------");
@@ -70,3 +86,4 @@ chart3
 //     .WithXAxisStyle(title: Title.init("Date"), ShowGrid: true, ShowLine: true)
 //     .WithYAxisStyle(title: Title.init("High"), ShowGrid: true, ShowLine: true)
 //     .Show();
+*/
