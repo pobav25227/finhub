@@ -27,7 +27,7 @@ static async Task ShowTimeOfSymbolSerial(List<FinnHubModel>? symbols, int count,
     watch.Start();
     foreach (var item in symbols)
     {
-        if (++i % 40 == 0)
+        if (++i % 49 == 0)
         {
             Thread.Sleep(1000 * 60);
         }
