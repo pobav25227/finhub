@@ -22,10 +22,16 @@ await ShowTimeOfSymbolSerial(symbols, count, client);
 
 static async Task ShowTimeOfSymbolSerial(List<FinnHubModel>? symbols, int count, FinnHubClient client)
 {
+    var i = 0;
     var watch = new Stopwatch();
     watch.Start();
     foreach (var item in symbols)
     {
+        if (++i % 40 == 0)
+        {
+            Thread.Sleep(1000 * 60);
+        }
+
         var datas = await client.GetCandlesAsync(item.Symbol, FinnHub.Net.Enums.FinnHubTimeResolutions.Daily, DateTime.Now.AddDays(-2), DateTime.Now);
         if (!datas.Success)
         {
